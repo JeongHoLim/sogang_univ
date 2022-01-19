@@ -1,0 +1,8 @@
+1. Compilation method
+- After checking 'Makefile' exists, enter 'make' to compile the codes.
+2. How to execute
+- Enter './20171682.out' to make 20171682.out run.
+  When enabled , you can see that 'sicsim>' appears on the left side of the console window.
+3. Entering Commands
+- If you enter 'help' or 'h' while the program is running, the list of instructions will appear, so you can use the program for reference.
+4. If you want to close, enter q or qit.
