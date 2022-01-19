@@ -1,0 +1,350 @@
+
+create table brand
+	(b_id		char(5),
+     name		varchar(30) not null,
+     primary key(b_id),
+     check(b_id >='10000' and b_id <'20000')
+    );
+create table model
+	(m_id		char(5),
+	 b_id		char(5) not null,
+     name		varchar(20) not null,
+     price		numeric(9,0) not null ,
+     body_style	varchar(30) not null,
+     primary key(m_id),
+     foreign key(b_id) references brand (b_id)
+		on delete cascade,
+	check(m_id >='80000' and m_id <'90000')
+	);
+
+create table model_price
+	(m_id			char(5),
+     engine			varchar(20) ,
+     color			varchar(20) ,
+     transmission	varchar(20) ,
+     price			numeric(9,0),
+     primary key (engine,color,transmission,m_id),
+	 foreign key (m_id) references model (m_id)
+		on delete cascade
+     );
+    
+create table customer
+	(c_id		char(5),
+     name		varchar(10) not null,
+     address 	varchar(50),
+     phone		varchar(15) not null,
+     gender 	char,
+     annual_income	numeric(10,2),
+     check (annual_income > 0) ,
+     primary key (c_id),
+	 check(c_id>='20000' and c_id < '30000')
+     );
+create table dealer
+	(d_id		char(5),
+     name		varchar(10) not null,
+     address 	varchar(50) not null,
+     phone		varchar(15) not null,
+     primary key(d_id),
+     check('60000'<= d_id and d_id <'70000')
+    );
+create table assembly_plants
+	(ap_id			char(5),
+	 address 		varchar(50) not null,
+	 phone			varchar(15) not null,
+     primary key (ap_id),
+     check('90000'<= ap_id and ap_id <='99999')
+	);
+
+create table supply_plants
+	(phone					varchar(15) not null,
+	 address				varchar(50) not null, 
+	 supply_plant_name		varchar(30),
+	 supply_company_name	varchar(30) ,
+     primary key (supply_plant_name,supply_company_name)	
+	);
+create table parts
+	(supply_type			varchar(30),
+	 supply_date			date, 
+	 supply_plant_name		varchar(30),
+	 supply_company_name	varchar(30),
+     primary key (supply_type,supply_date,supply_plant_name,supply_company_name),		
+     foreign key (supply_plant_name,supply_company_name) references supply_plants (supply_plant_name,supply_company_name)
+		on delete cascade
+	);
+
+
+create table supply
+	(ap_id					char(5),
+	 supply_type			varchar(30), 
+	 supply_date			date, 
+	 supply_plant_name		varchar(30),
+	 supply_company_name	varchar(30),
+     primary key (ap_id,supply_type,supply_date,supply_plant_name,supply_company_name),		
+	 foreign key (ap_id) references assembly_plants (ap_id)
+		on delete cascade,
+     foreign key (supply_type,supply_date,supply_plant_name,supply_company_name) references parts (supply_type,supply_date,supply_plant_name,supply_company_name)
+		on delete cascade
+	);
+
+create table parts_list
+	(parts_type				varchar(20),
+	 m_id					char(5), 
+	 primary key (parts_type,m_id),		
+     foreign key (m_id) references model (m_id)
+		on delete cascade
+	);
+create table out_sourcing
+	(parts_type				varchar(20),
+	 m_id					char(5) , 
+	 supply_plant_name		varchar(30),
+	 supply_company_name	varchar(30),
+     primary key (parts_type,m_id,supply_plant_name,supply_company_name),		
+     foreign key (supply_plant_name,supply_company_name) references supply_plants (supply_plant_name,supply_company_name)
+		on delete cascade,
+	 foreign key (parts_type,m_id) references parts_list (parts_type,m_id)
+		on delete cascade
+	);
+create table vehicle
+	(VIN			char(17),  
+	 garage_date	date,
+     purchase_date	date,
+     assemble_date	date,
+     c_id			char(5),
+     d_id			char(5),
+     ap_id			char(5),
+     m_id			char(5),
+     engine			varchar(20) ,
+     color			varchar(20) ,
+     transmission	varchar(20) ,
+	 primary key (VIN),
+	 foreign key (c_id) references customer (c_id)
+		on delete set null,
+	 foreign key (m_id) references model (m_id)
+		on delete set null,
+	 foreign key (ap_id) references assembly_plants (ap_id)
+		on delete set null,
+	 foreign key (d_id) references dealer (d_id)
+		on delete set null,
+	 foreign key (engine, color, transmission) references model_price (engine, color, transmission)
+		on delete set null
+	);
+    create table consist
+	(VIN					char(17) ,
+	 supply_type			varchar(30), 
+	 supply_date			date, 
+	 supply_plant_name		varchar(30),
+	 supply_company_name	varchar(30),
+     primary key (VIN,supply_type,supply_date,supply_plant_name,supply_company_name),		
+	 foreign key (VIN) references vehicle (VIN)
+		on delete cascade,
+     foreign key (supply_type,supply_date,supply_plant_name,supply_company_name) references parts (supply_type,supply_date,supply_plant_name,supply_company_name)
+		on delete cascade
+	);
+insert into brand values('10000','Audi');
+insert into brand values('10001','Chevrolet');
+insert into brand values('10002','Porsche');
+insert into brand values('10003','Bentley');
+insert into brand values('10004','Lamborghini');
+insert into brand values('10005','Bugatti');
+insert into brand values('10006','RollsRoyce');
+insert into brand values('10007','H-Company');
+insert into brand values('10008','Kia');
+insert into brand values('10009','Hyundai');
+insert into brand values('10010','Tesla');
+insert into brand values('10011','Volkswagen');
+insert into brand values('10012','Bmw');
+insert into brand values('10013','Bents');
+insert into brand values('10014','JuBro');
+insert into model values('80100','10000','A4','493550','4-door');
+insert into model values('80101','10000','A8','136960','4-door');
+insert into model values('80102','10000','R8','255690','4-door');
+insert into model values('80103','10001','Travers','45200','4-door');
+insert into model values('80104','10001','Malibu','23640','4-door');
+insert into model values('80105','10001','BOLT_EV','26730','4-door');
+insert into model values('80106','10002','718','83900','2-door');
+insert into model values('80107','10002','Taycan','145600','2-door');
+insert into model values('80108','10002','911','149900','2-door');
+insert into model values('80109','10003','Flying_spur','323000','4-door');
+insert into model values('80110','10003','GT_convertible','313000','convertible');
+insert into model values('80111','10004','Aventador','423000','2-door');
+insert into model values('80112','10004','Uracan','333290','2-door');
+insert into model values('80113','10005','Siron_pure_sports',3320000,'2-door');
+insert into model values('80114','10006','Ghost','470000','4-door');
+insert into model_price values('80100','v1','grey','2','53000');
+insert into model_price values('80101','v1','grey','2','154000');
+insert into model_price values('80102','v1','black','3','285000');
+insert into model_price values('80103','v2','black','2','46400');
+insert into model_price values('80104','v2','white','1','24400');
+insert into model_price values('80105','v2','grey','1','27300');
+insert into model_price values('80106','v3','grey','2','85400');
+insert into model_price values('80107','v3','white','2','147800');
+insert into model_price values('80108','v3','grey','3','156300');
+insert into model_price values('80109','v4','black','2','324000');
+insert into model_price values('80110','v4','gold','3','314000');
+insert into model_price values('80111','v4','blue','3','435000');
+insert into model_price values('80112','v4','orange','3','345400');
+insert into model_price values('80113','v5','skyblue','3','3330000');
+insert into model_price values('80114','v4','black','3','471000');
+insert into customer values('20000','JuHyeong','Seoul_mapo_yeomli_1-4','010-2000-0000','M','150000');
+insert into customer values('20001','SeoungHoi','Seoul_mapo_sinsu_15-1','010-2010-0001','M','165000');
+insert into customer values('20002','JinWoo','Seoul_gangnam_13-1','010-2020-0002','M','750000');
+insert into customer values('20003','JooEon','Seoul_gangnam_apugujeong_23-52','010-2030-0003','M','100000');
+insert into customer values('20004','JaeWon','Seoul_yongsan_sinsu_43-9','010-2040-0004','M','100000');
+insert into customer values('20005','HaeWook','Kyeongi_gwacheon_23-1','010-2050-0005','M','100000');
+insert into customer values('20006','EunSang','Seoul_mapo_sder_48-27','010-2060-0006','M','100000');
+insert into customer values('20007','RoSeph','Seoul_seodae_yeomli_109-12','010-2070-0007','M','100000');
+insert into customer values('20015','JeongHo','Seoul_mapo_sinsu_2_94','010-2140-0014','M','1000000');
+insert into customer values('20008','HaMin','Kyeongi_gwacheon_42-23','010-2080-0008','F','100000');
+insert into customer values('20009','JiHye','Seoul_yongsan_13-112','010-2090-0009','F','100000');
+insert into customer values('20010','HyeJi','Seoul_slie_konoe_133-123','010-2100-0010','F','100000');
+insert into customer values('20011','MyeongHwa','Seoul_mapo_plose_211-521','010-2110-0011','F','100000');
+insert into customer values('20012','YeongLan','Seoul_dongaemun_spesu_12-112','010-2120-0012','F','100000');
+insert into customer values('20013','JiMin','Incheon_mapo_sinsu_13-51','010-2130-0013','F','100000');
+insert into customer values('20014','SeoYeon','Daejeon_selet_sheong_101-1','010-2140-0014','F','100000');
+insert into dealer values('60000','GangNam','GangNam','010-6000-6001');
+insert into dealer values('60001','Mapo','Mapo','010-6000-6001');
+insert into dealer values('60002','Incheon','Inchecon','010-6000-6002');
+insert into dealer values('60003','GwaCheon','Gwacheon','010-6000-6003');
+insert into dealer values('60004','Yongsan','yongsan','010-6000-6004');
+insert into dealer values('60005','dooon','ddm','010-6000-6005');
+insert into dealer values('60006','Clara','clsrser','010-6000-6006');
+insert into dealer values('60007','Willow','LA','010-6000-6007');
+insert into dealer values('60008','Amy','Japan','010-6000-6008');
+insert into dealer values('60009','Alex','Vietnam','010-6000-6009');
+insert into dealer values('60010','Kasar','China','010-6000-6010');
+insert into dealer values('60011','Issac','India','010-6000-6011');
+insert into dealer values('60012','Hue','Canada','010-6000-6012');
+insert into dealer values('60013','Naomi','Yoewe','010-6000-6013');
+insert into dealer values('60014','Victoria','NewYork','010-6000-6014');
+insert into assembly_plants values('90000','Seoul','010-9000-9000');
+insert into assembly_plants values('90001','Incheon','010-9000-9001');
+insert into assembly_plants values('90002','GwaCheon','010-9000-9002');
+insert into assembly_plants values('90003','LA','010-9000-9003');
+insert into assembly_plants values('90004','NewYork','010-9000-9004');
+insert into assembly_plants values('90005','India','010-9000-9005');
+insert into assembly_plants values('90006','China','010-9000-9006');
+insert into assembly_plants values('90007','Brazil','010-9000-9007');
+insert into assembly_plants values('90008','dao','010-9000-9008');
+insert into assembly_plants values('90009','bazzi','010-9000-9009');
+insert into assembly_plants values('90010','dizini','010-9000-9010');
+insert into assembly_plants values('90011','eddi','010-9000-9011');
+insert into assembly_plants values('90012','suden','010-9000-9012');
+insert into assembly_plants values('90013','cuba','010-9000-9013');
+insert into assembly_plants values('90014','England','010-9000-9014');
+insert into supply_plants values('010-8000-8000','mapo','korp1','Korea');
+insert into supply_plants values('010-8000-8001','gangnam','korp2','Korea');
+insert into supply_plants values('010-8000-8002','yongsan','korp3','Korea');
+insert into supply_plants values('010-8000-8003','ddm','korp4','Korea');
+insert into supply_plants values('010-8000-8004','LA','usap1','Usa');
+insert into supply_plants values('010-8000-8005','NewYork','usap2','Usa');
+insert into supply_plants values('010-8000-8006','China','chip1','China');
+insert into supply_plants values('010-8000-8007','India','indp1','China');
+insert into supply_plants values('010-8000-8008','Eng','engp1','Eng');
+insert into supply_plants values('010-8000-8009','Vietnam','viep1','VietNam');
+insert into supply_plants values('010-8000-8010','Japan','jap1','Japan');
+insert into supply_plants values('010-8000-8011','Canada','cap1','canada');
+insert into supply_plants values('010-8000-8012','Gwacheon','korp5','Korea');
+insert into supply_plants values('010-8000-8013','Incheon','korp6','Korea');
+insert into supply_plants values('010-8000-8014','Daejeon','korbup1','Bugatti');
+insert into parts values('handle','2018-10-23','korp1','Korea');
+insert into parts values('door','2018-12-02','korp2','Korea');
+insert into parts values('window','2018-03-11','korp3','Korea');
+insert into parts values('engine','2018-12-21','korp6','Korea');
+insert into parts values('engine','2018-11-05','korbup1','Bugatti');
+insert into parts values('handle','2018-04-08','korp3','Korea');
+insert into parts values('door','2018-05-04','korp4','Korea');
+insert into parts values('trunk','2018-08-12','korp5','Korea');
+insert into parts values('trunk','2018-09-29','korp1','Korea');
+insert into parts values('transmission','2018-12-17','korp2','Korea');
+insert into parts values('transmission','2018-11-17','korp2','Korea');
+insert into parts values('tire','2018-03-11','korp4','Korea');
+insert into parts values('tire','2018-02-11','korp5','Korea');
+insert into parts values('seat','2018-04-14','korp3','Korea');
+insert into parts values('seat','2018-01-19','korp2','Korea');
+insert into supply values('90000','handle','2018-10-23','korp1','Korea');
+insert into supply values('90000','door','2018-12-02','korp2','Korea');
+insert into supply values('90000','window','2018-03-11','korp3','Korea');
+insert into supply values('90000','engine','2018-12-21','korp6','Korea');
+insert into supply values('90000','engine','2018-11-05','korbup1','Bugatti');
+insert into supply values('90000','handle','2018-04-08','korp3','Korea');
+insert into supply values('90000','door','2018-05-04','korp4','Korea');
+insert into supply values('90000','trunk','2018-08-12','korp5','Korea');
+insert into supply values('90000','trunk','2018-09-29','korp1','Korea');
+insert into supply values('90000','transmission','2018-12-17','korp2','Korea');
+insert into supply values('90000','transmission','2018-11-17','korp2','Korea');
+insert into supply values('90000','tire','2018-03-11','korp4','Korea');
+insert into supply values('90000','tire','2018-02-11','korp5','Korea');
+insert into supply values('90000','seat','2018-04-14','korp3','Korea');
+insert into supply values('90000','seat','2018-01-19','korp2','Korea');
+insert into parts_list values('handle','80100');
+insert into parts_list values('door','80101');
+insert into parts_list values('window','80102');
+insert into parts_list values('engine','80103');
+insert into parts_list values('seat','80104');
+insert into parts_list values('handle','80105');
+insert into parts_list values('door','80106');
+insert into parts_list values('trunk','80107');
+insert into parts_list values('trunk','80108');
+insert into parts_list values('transmission','80109');
+insert into parts_list values('transmission','80110');
+insert into parts_list values('tire','80111');
+insert into parts_list values('tire','80112');
+insert into parts_list values('engine','80113');
+insert into parts_list values('seat','80114');
+insert into out_sourcing values('handle','80100','korp1','Korea');
+insert into out_sourcing values('door','80101','korp2','Korea');
+insert into out_sourcing values('window','80102','korp3','Korea');
+insert into out_sourcing values('engine','80103','korp6','Korea');
+insert into out_sourcing values('seat','80104','korp4','Korea');
+insert into out_sourcing values('handle','80105','korp3','Korea');
+insert into out_sourcing values('door','80106','korp4','Korea');
+insert into out_sourcing values('trunk','80107','korp5','Korea');
+insert into out_sourcing values('trunk','80108','korp1','Korea');
+insert into out_sourcing values('transmission','80109','korp2','Korea');
+insert into out_sourcing values('transmission','80110','korp2','Korea');
+insert into out_sourcing values('tire','80111','korp4','Korea');
+insert into out_sourcing values('tire','80112','korp5','Korea');
+insert into out_sourcing values('engine','80113','korbup1','Bugatti');
+insert into out_sourcing values('seat','80114','korp3','Korea');
+insert into vehicle values('10000000000000000','2019-11-05','2019-12-29','2019-11-01','20000','60000','90000','80100','v1','grey','2');
+insert into vehicle values('10000000000000001','2020-12-11','2020-12-13','2020-12-06','20001','60001','90000','80101','v1','grey','2');
+insert into vehicle values('10000000000000002','2020-03-20','2020-04-20','2020-03-16','20002','60002','90000','80102','v1','black','3');
+insert into vehicle values('10000000000000003','2019-12-30','2020-01-12','2019-12-26','20003','60003','90000','80103','v2','black','2');
+insert into vehicle values('10000000000000004','2019-11-14','2020-01-13','2019-11-11','20004','60004','90000','80104','v2','white','1');
+insert into vehicle values('10000000000000005','2020-04-17','2020-08-17','2020-04-13','20005','60005','90000','80105','v2','grey','1');
+insert into vehicle values('10000000000000006','2021-05-13','2021-06-05','2021-05-09','20006','60006','90000','80106','v3','grey','2');
+insert into vehicle values('10000000000000007','2020-08-21','2020-11-09','2020-08-17','20007','60007','90000','80107','v3','white','2');
+insert into vehicle values('10000000000000008','2020-02-10','2020-03-13','2020-01-18','20015','60000','90000','80113','v5','skyblue','3');
+insert into vehicle values('10000000000000009','2019-11-05','2020-02-19' ,'2019-11-01','20000','60000','90000','80105','v2','grey','1');
+insert into vehicle values('10000000000000010','2020-12-11','2021-04-17','2020-12-06','20001','60001','90000','80106','v3','grey','2');
+insert into vehicle values('10000000000000011','2021-03-20','2021-03-21','2021-03-16','20014','60002','90000','80107','v3','white','2');
+insert into vehicle values('10000000000000012','2019-12-30','2020-02-18','2019-12-26','20013','60008','90000','80108','v3','grey','3');
+insert into vehicle values('10000000000000013','2019-11-14','2019-12-19','2019-11-11','20012','60009','90000','80110','v4','black','2');
+insert into vehicle values('10000000000000014','2020-04-17','2020-06-11','2020-04-13','20011','60010','90000','80110','v4','black','2');
+insert into vehicle values('10000000000000015','2021-05-13','2021-06-04','2021-05-09','20010','60011','90000','80110','v4','black','2');
+insert into vehicle values('10000000000000016','2021-04-21',null,'2021-03-17',null,'60012','90000','80102','v1','black','3');
+insert into vehicle values('10000000000000017','2021-05-10',null,'2021-04-06',null,'60013','90000','80103','v2','black','2');
+insert into vehicle values('10000000000000027','2021-02-27',null,'2021-01-07',null,'60004','90000','80104','v2','white','1');
+insert into vehicle values('10000000000000028','2021-01-30',null,'2021-01-07',null,'60004','90000','80105','v2','grey','1');
+insert into vehicle values('10000000000000029','2021-02-12',null,'2021-01-10',null,'60005','90000','80106','v3','grey','2');
+insert into consist values('10000000000000000','handle','2018-10-23','korp1','Korea');
+insert into consist values('10000000000000001','door','2018-12-02','korp2','Korea');
+insert into consist values('10000000000000002','window','2018-03-11','korp3','Korea');
+insert into consist values('10000000000000003','engine','2018-12-21','korp6','Korea');
+insert into consist values('10000000000000004','seat','2018-01-19','korp2','Korea');
+insert into consist values('10000000000000005','handle','2018-04-08','korp3','Korea');
+insert into consist values('10000000000000006','door','2018-05-04','korp4','Korea');
+insert into consist values('10000000000000007','trunk','2018-08-12','korp5','Korea');
+insert into consist values('10000000000000008','engine','2018-11-05','korbup1','Bugatti');
+insert into consist values('10000000000000009','handle','2018-10-23','korp1','Korea');
+insert into consist values('10000000000000010','door','2018-05-04','korp4','Korea');
+insert into consist values('10000000000000011','trunk','2018-08-12','korp5','Korea');
+insert into consist values('10000000000000012','trunk','2018-09-29','korp1','Korea');
+insert into consist values('10000000000000013','transmission','2018-12-17','korp2','Korea');
+insert into consist values('10000000000000014','transmission','2018-12-17','korp2','Korea');
+insert into consist values('10000000000000015','transmission','2018-12-17','korp2','Korea');
+insert into consist values('10000000000000016','window','2018-03-11','korp3','Korea');
+insert into consist values('10000000000000017','engine','2018-12-21','korp6','Korea');
+insert into consist values('10000000000000027','seat','2018-01-19','korp2','Korea');
+insert into consist values('10000000000000028','handle','2018-04-08','korp3','Korea');
+insert into consist values('10000000000000029','door','2018-05-04','korp4','Korea');
